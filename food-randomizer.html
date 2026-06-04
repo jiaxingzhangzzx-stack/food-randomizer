@@ -1,0 +1,700 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>今天吃什么 - 1 到 67 美食摇号</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #231f20;
+      --muted: #6f625b;
+      --paper: #fff8ef;
+      --panel: #ffffff;
+      --line: #ead9c8;
+      --red: #d94332;
+      --green: #2f7d52;
+      --yellow: #f6b73c;
+      --blue: #2f6f9f;
+      --shadow: 0 18px 45px rgba(75, 47, 31, .16);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Microsoft YaHei", "PingFang SC", "Noto Sans CJK SC", Arial, sans-serif;
+      color: var(--ink);
+      background:
+        linear-gradient(135deg, rgba(217, 67, 50, .08) 0 25%, transparent 25% 50%, rgba(47, 125, 82, .07) 50% 75%, transparent 75%) 0 0 / 34px 34px,
+        var(--paper);
+    }
+
+    .page {
+      width: min(1120px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 28px 0 42px;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      margin-bottom: 22px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .brand-mark {
+      display: grid;
+      place-items: center;
+      width: 52px;
+      height: 52px;
+      border-radius: 16px;
+      background: var(--red);
+      color: #fff;
+      font-size: 27px;
+      box-shadow: 0 10px 24px rgba(217, 67, 50, .28);
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(26px, 4vw, 44px);
+      line-height: 1.08;
+      letter-spacing: 0;
+    }
+
+    .subtitle {
+      margin: 8px 0 0;
+      color: var(--muted);
+      font-size: 15px;
+    }
+
+    .food-strip {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      gap: 8px;
+      max-width: 460px;
+    }
+
+    .food-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 10px;
+      border: 1px solid rgba(35, 31, 32, .08);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, .78);
+      color: #4a3d37;
+      font-size: 13px;
+      white-space: nowrap;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.05fr) minmax(300px, .95fr);
+      gap: 22px;
+      align-items: stretch;
+    }
+
+    .draw-panel,
+    .result-panel,
+    .list-panel {
+      background: rgba(255, 255, 255, .92);
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow);
+    }
+
+    .draw-panel {
+      min-height: 420px;
+      padding: clamp(20px, 4vw, 34px);
+      display: grid;
+      align-content: center;
+      border-radius: 24px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .draw-panel::before {
+      content: "🍲 🍔 🍕 🍜 🍗 🥟 🐟 🥘";
+      position: absolute;
+      left: 22px;
+      right: 22px;
+      top: 18px;
+      color: rgba(35, 31, 32, .08);
+      font-size: clamp(30px, 5vw, 54px);
+      text-align: center;
+      pointer-events: none;
+    }
+
+    .number-wrap {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      justify-items: center;
+      gap: 20px;
+    }
+
+    .range-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border: 1px solid #f0d2bf;
+      border-radius: 999px;
+      background: #fff2e3;
+      color: #8a3a2f;
+      font-weight: 700;
+      font-size: 14px;
+    }
+
+    .number {
+      width: min(285px, 70vw);
+      aspect-ratio: 1;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background:
+        radial-gradient(circle at 50% 38%, #fff 0 28%, transparent 29%),
+        conic-gradient(from 0deg, var(--red), var(--yellow), var(--green), var(--blue), var(--red));
+      color: #fff;
+      text-shadow: 0 4px 16px rgba(0, 0, 0, .24);
+      font-size: clamp(78px, 17vw, 140px);
+      font-weight: 900;
+      font-variant-numeric: tabular-nums;
+      line-height: 1;
+      box-shadow: inset 0 -16px 28px rgba(0, 0, 0, .12), 0 24px 52px rgba(118, 64, 36, .25);
+      user-select: none;
+    }
+
+    .number.is-rolling {
+      animation: pop .16s ease-out infinite alternate;
+    }
+
+    @keyframes pop {
+      from { transform: scale(.985) rotate(-1deg); }
+      to { transform: scale(1.015) rotate(1deg); }
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      justify-content: center;
+      align-items: center;
+    }
+
+    button,
+    input {
+      font: inherit;
+    }
+
+    .btn {
+      border: 0;
+      min-height: 48px;
+      padding: 0 22px;
+      border-radius: 999px;
+      cursor: pointer;
+      font-weight: 800;
+      transition: transform .18s ease, box-shadow .18s ease, opacity .18s ease;
+    }
+
+    .btn:active { transform: translateY(1px) scale(.99); }
+    .btn:disabled { cursor: not-allowed; opacity: .68; }
+
+    .btn-primary {
+      background: var(--red);
+      color: #fff;
+      box-shadow: 0 12px 28px rgba(217, 67, 50, .25);
+    }
+
+    .btn-ghost {
+      background: #fff;
+      color: #57433b;
+      border: 1px solid var(--line);
+    }
+
+    .manual {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px;
+      border-radius: 999px;
+      background: #fff;
+      border: 1px solid var(--line);
+    }
+
+    .manual input {
+      width: 84px;
+      min-height: 36px;
+      border: 0;
+      outline: 0;
+      text-align: center;
+      font-weight: 800;
+      color: var(--ink);
+      background: transparent;
+    }
+
+    .result-panel {
+      border-radius: 24px;
+      padding: 24px;
+      display: grid;
+      gap: 16px;
+      min-height: 420px;
+    }
+
+    .section-title {
+      margin: 0;
+      font-size: 18px;
+      letter-spacing: 0;
+    }
+
+    .picked {
+      border-radius: 18px;
+      background: #fff7ec;
+      border: 1px solid #f3d7bd;
+      padding: 18px;
+    }
+
+    .picked-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 14px;
+      margin-bottom: 14px;
+    }
+
+    .picked-num {
+      flex: 0 0 auto;
+      display: grid;
+      place-items: center;
+      width: 54px;
+      height: 54px;
+      border-radius: 18px;
+      background: var(--green);
+      color: #fff;
+      font-size: 25px;
+      font-weight: 900;
+    }
+
+    .picked-store {
+      margin: 0;
+      font-size: clamp(24px, 4vw, 36px);
+      line-height: 1.16;
+      letter-spacing: 0;
+    }
+
+    .meta {
+      display: grid;
+      gap: 10px;
+    }
+
+    .meta-row {
+      display: grid;
+      grid-template-columns: 78px 1fr;
+      gap: 10px;
+      align-items: start;
+      padding-top: 10px;
+      border-top: 1px dashed rgba(138, 105, 78, .28);
+    }
+
+    .meta-label {
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .meta-value {
+      font-size: 16px;
+      line-height: 1.65;
+      word-break: break-word;
+    }
+
+    .history {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      min-height: 34px;
+    }
+
+    .history-item {
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: #fff;
+      padding: 7px 10px;
+      font-size: 13px;
+      color: #5a453d;
+    }
+
+    .list-panel {
+      margin-top: 22px;
+      border-radius: 24px;
+      overflow: hidden;
+    }
+
+    .list-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      padding: 18px 20px;
+      border-bottom: 1px solid var(--line);
+      background: #fffdf8;
+    }
+
+    .search {
+      width: min(360px, 100%);
+      min-height: 42px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 0 15px;
+      outline: 0;
+      color: var(--ink);
+      background: #fff;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 12px;
+      padding: 16px;
+      max-height: 520px;
+      overflow: auto;
+    }
+
+    .food-card {
+      border: 1px solid #eedfce;
+      border-radius: 16px;
+      background: #fff;
+      padding: 14px;
+      transition: transform .16s ease, border-color .16s ease, box-shadow .16s ease;
+    }
+
+    .food-card.is-active {
+      border-color: var(--red);
+      box-shadow: 0 12px 26px rgba(217, 67, 50, .15);
+      transform: translateY(-2px);
+    }
+
+    .card-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 8px;
+    }
+
+    .card-num {
+      display: grid;
+      place-items: center;
+      width: 34px;
+      height: 34px;
+      border-radius: 12px;
+      background: #fff0df;
+      color: #9b3a2d;
+      font-weight: 900;
+    }
+
+    .card-store {
+      margin: 0;
+      font-size: 17px;
+      letter-spacing: 0;
+    }
+
+    .card-dish,
+    .card-place {
+      margin: 8px 0 0;
+      color: #5e5049;
+      line-height: 1.55;
+      font-size: 14px;
+    }
+
+    .card-place {
+      color: #8a6a5d;
+    }
+
+    @media (max-width: 820px) {
+      .topbar,
+      .hero,
+      .list-header {
+        grid-template-columns: 1fr;
+        display: grid;
+      }
+
+      .food-strip {
+        justify-content: flex-start;
+        max-width: none;
+      }
+
+      .draw-panel,
+      .result-panel {
+        min-height: auto;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: .01ms !important;
+        animation-iteration-count: 1 !important;
+        scroll-behavior: auto !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true">🍽</div>
+        <div>
+          <h1>今天吃什么</h1>
+          <p class="subtitle">1-67 随机摇号，摇到哪个吃哪个。</p>
+        </div>
+      </div>
+      <div class="food-strip" aria-label="美食氛围标签">
+        <span class="food-chip">🍗 肯德基</span>
+        <span class="food-chip">🐟 来凤鱼</span>
+        <span class="food-chip">🐇 璧山兔</span>
+        <span class="food-chip">🥘 花雕醉鸡</span>
+        <span class="food-chip">🍜 螺蛳粉</span>
+        <span class="food-chip">🍔 汉堡</span>
+      </div>
+    </header>
+
+    <section class="hero">
+      <div class="draw-panel" aria-label="随机抽取区域">
+        <div class="number-wrap">
+          <span class="range-label">🎲 随机范围 1 - 67</span>
+          <div class="number" id="numberDisplay" aria-live="polite">?</div>
+          <div class="actions">
+            <button class="btn btn-primary" id="drawBtn" type="button" title="随机抽取一个美食编号">🎲 开摇</button>
+            <button class="btn btn-ghost" id="againBtn" type="button" title="再抽一次">再来一次</button>
+            <label class="manual" title="输入指定编号查看">
+              <span aria-hidden="true">#</span>
+              <input id="manualInput" type="number" min="1" max="67" placeholder="编号">
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <aside class="result-panel" aria-label="抽取结果">
+        <h2 class="section-title">本次结果</h2>
+        <div class="picked" id="pickedCard">
+          <div class="picked-head">
+            <div>
+              <p class="picked-store" id="pickedStore">先摇一下</p>
+            </div>
+            <div class="picked-num" id="pickedNum">?</div>
+          </div>
+          <div class="meta">
+            <div class="meta-row">
+              <div class="meta-label">推荐菜</div>
+              <div class="meta-value" id="pickedDish">让随机数决定今天的快乐。</div>
+            </div>
+            <div class="meta-row">
+              <div class="meta-label">位置</div>
+              <div class="meta-value" id="pickedPlace">龙湖时代天街、南门、食堂、商业街、配送到校都在池子里。</div>
+            </div>
+          </div>
+        </div>
+        <div>
+          <h2 class="section-title">最近摇到</h2>
+          <div class="history" id="historyList">
+            <span class="history-item">暂无记录</span>
+          </div>
+        </div>
+      </aside>
+    </section>
+
+    <section class="list-panel" aria-label="完整美食清单">
+      <div class="list-header">
+        <h2 class="section-title">完整 67 项清单</h2>
+        <input class="search" id="searchInput" type="search" placeholder="搜索店名、菜品或地址">
+      </div>
+      <div class="grid" id="foodGrid"></div>
+    </section>
+  </main>
+
+  <script>
+    const foods = [
+      { id: 1, store: '蜀砂锅', dish: '肉末茄子、砂锅鲜椒兔', place: '龙湖时代天街' },
+      { id: 2, store: '劲烤地摊牛肉小串', dish: '蜂蜜面包片、猪五花', place: '龙湖时代天街' },
+      { id: 3, store: '小王鲜炒', dish: '小炒肉、一碗香', place: '龙湖时代天街' },
+      { id: 4, store: '无名蹄花', dish: '蹄花、凉拌菜', place: '南门' },
+      { id: 5, store: '秦味和面馆', dish: '三合一扯面、油泼拉条子', place: '龙湖时代天街' },
+      { id: 6, store: '余记快炒', dish: '仔姜肉丝、泡椒鸡杂', place: '龙湖时代天街' },
+      { id: 7, store: '吉六六荤豆花', dish: '黄金豆汤锅底', place: '龙湖时代天街' },
+      { id: 8, store: '鲜肉老友粉', dish: '老友粉+虎皮凤爪', place: '龙湖时代天街' },
+      { id: 9, store: '石烹木桶鱼', dish: '藤椒锅底+黔鱼', place: '龙湖时代天街' },
+      { id: 10, store: '来凤鱼璧山兔', dish: '长条馒头、来凤鱼', place: '龙湖时代天街' },
+      { id: 11, store: '旺苍酸辣粉', dish: '酸辣粉', place: '龙湖时代天街' },
+      { id: 12, store: '吹炊鸡杂馆', dish: '美团双人套餐', place: '龙湖时代天街' },
+      { id: 13, store: '小煲贝', dish: '黑椒牛肉+叉烧+窝蛋', place: '南门' },
+      { id: 14, store: '南门叔叔肠粉', dish: '原味肠粉+火腿', place: '南门' },
+      { id: 15, store: '柳螺哥螺蛳粉', dish: '招牌+猪皮+腊肠', place: '黄焖鸡对面' },
+      { id: 16, store: '陈索索花雕醉鸡', dish: '中辣锅+豆腐皮、小狗', place: '龙湖时代天街' },
+      { id: 17, store: '蕉南街', dish: '咖喱牛腩、猪颈排', place: '龙湖时代天街' },
+      { id: 18, store: '刘小亮东北铁锅炖', dish: '铁锅炖大鹅、锅包肉', place: '龙湖时代天街' },
+      { id: 19, store: '山喜和牛自助', dish: '上脑、肥牛', place: '龙湖时代天街' },
+      { id: 20, store: '一把骨', dish: '干锅、糯香鸭掌', place: '龙湖时代天街' },
+      { id: 21, store: '贝贝乔意面', dish: '墨鱼意面、原切牛排', place: '龙湖时代天街' },
+      { id: 22, store: '东北饺子家常菜', dish: '溜肉段、东北大拉皮', place: '龙湖时代天街' },
+      { id: 23, store: '盐都干锅王', dish: '干锅鸡', place: '龙湖时代天街' },
+      { id: 24, store: '丁一鸣花雕醉鸡', dish: '蒜香排骨、微辣锅底', place: '龙湖时代天街' },
+      { id: 25, store: '好运猪咖喱饭', dish: '蒜香厚切川辣鸡排', place: '龙湖时代天街' },
+      { id: 26, store: '臻溢香冒烤鸭', dish: '烤鸭+免费素菜自选', place: '龙湖时代天街' },
+      { id: 27, store: '鸡公小灶', dish: '油豆腐、凤爪', place: '龙湖时代天街' },
+      { id: 28, store: '老美牛排饭', dish: '卤肉饭、红烧牛腩饭', place: '龙湖时代天街' },
+      { id: 29, store: '点妈手工饺子', dish: '猪肉大葱饺、三鲜饺', place: '龙湖时代天街' },
+      { id: 30, store: '老叶川菜馆', dish: '蒜香排骨、椒麻仔鸡', place: '龙湖时代天街' },
+      { id: 31, store: '有盐有味川菜馆', dish: '麻辣腰花、一碗香', place: '龙湖时代天街' },
+      { id: 32, store: '张亮麻辣烫', dish: '美团 23.8 单人套餐', place: '龙湖时代天街' },
+      { id: 33, store: '汤婆婆鸡汤饭', dish: '排骨鸡汤饭', place: '龙湖时代天街' },
+      { id: 34, store: 'WIKI Burger', dish: '安格斯牛肉拌饭', place: '龙湖时代天街' },
+      { id: 35, store: '抱汁汁', dish: '藤椒鸡腿、烧椒皮蛋牛肉堡', place: '龙湖时代天街' },
+      { id: 36, store: '北村韩屋韩式炸鸡', dish: '海苔肉松贝贝炸鸡', place: '龙湖时代天街' },
+      { id: 37, store: '达美乐披萨', dish: '金沙咸蛋黄嫩鸡披萨', place: '龙湖时代天街' },
+      { id: 38, store: '必胜客', dish: '每一款汉堡', place: '龙湖时代天街' },
+      { id: 39, store: '汉江里炸鸡', dish: '威士忌脆脆鸡、年糕香肠卷', place: '龙湖时代天街' },
+      { id: 40, store: '八度烤云南菜', dish: '鸡脚筋、土豆泥', place: '龙湖时代天街' },
+      { id: 41, store: '攀枝花盐边米线', dish: '双哨羊肉米线', place: '龙湖时代天街' },
+      { id: 42, store: '何记美蛙鱼', dish: '鱼蛙混吃自助', place: '龙湖时代天街' },
+      { id: 43, store: '升钟鱼', dish: '美蛙肥肠鱼自助', place: '龙湖时代天街' },
+      { id: 44, store: '拾间拾好巷口串串', dish: '火锅粉、蛋炒饭', place: '龙湖时代天街' },
+      { id: 45, store: '钰善里', dish: '锅包肉炸酱面', place: '龙湖时代天街' },
+      { id: 46, store: '不止鲜', dish: '锅包肉、炸蘑菇、卤肉饭', place: '龙湖时代天街' },
+      { id: 47, store: '尹三顺', dish: '鸡蛋布蕾、泰式咖喱牛肉', place: '龙湖时代天街' },
+      { id: 48, store: '昊来了', dish: '脑花一口饭、鹅肝', place: '龙湖时代天街' },
+      { id: 49, store: '派克鸡排', dish: '脆皮去骨鸡腿排', place: '龙湖时代天街' },
+      { id: 50, store: '围满停车场烧烤', dish: '芥菜春饺、沙葱牛肉', place: '龙湖时代天街' },
+      { id: 51, store: '螺一螺螺蛳粉', dish: '鸭掌螺蛳粉', place: '龙湖时代天街' },
+      { id: 52, store: '李记河南烩面', dish: '生椒牛肉、大盘鸡', place: '龙湖时代天街' },
+      { id: 53, store: '滨寿司', dish: '鳗鱼系列全肯定', place: '龙湖时代天街' },
+      { id: 54, store: '黄师傅拌面', dish: '小炒牛肉拌面', place: '南门' },
+      { id: 55, store: '啫小小瓦香鸡', dish: '中辣煲（一定要加方便面）', place: '龙湖时代天街' },
+      { id: 56, store: '学子餐厅档口', dish: '麻辣烫、酸汤肥牛（不要米饭+方便面）、笋干肉拌面、家园串串', place: '学子餐厅' },
+      { id: 57, store: '桃园餐厅档口', dish: '猪蹄（求白月光回归）', place: '桃园餐厅' },
+      { id: 58, store: '西北餐厅档口', dish: '孜然牛肉拌面、大盘鸡拌饼', place: '西北餐厅' },
+      { id: 59, store: '朝阳餐厅档口', dish: '渣渣肉拌饭、煲仔饭、老麻抄手、可乐鸡饭、土耳其烤肉饭、三味饭', place: '朝阳餐厅' },
+      { id: 60, store: '银桦食堂档口', dish: '滑蛋饭、冒烤鸭、土豆泥炸酱拌面、鱼香藕饼、厨之味、麻辣蛙（三楼自选菜）、烧鸭饭', place: '银桦食堂' },
+      { id: 61, store: '食堂', dish: '铁板烧、鸡汤馄饨、跷脚牛肉', place: '思源食堂' },
+      { id: 62, store: '科创食堂档口', dish: '花溪牛肉米粉、猪脚饭、重庆小面、小炒全肯定、麻辣烫、番茄牛腩饭', place: '科创食堂' },
+      { id: 63, store: '芙蓉餐厅档口', dish: '三楼冒菜、担担面', place: '芙蓉餐厅' },
+      { id: 64, store: '商业街小吃', dish: '巷口老卤猪脚饭、酥肉蛋汤饭、麦当劳、JOJO 小铺', place: '商业街' },
+      { id: 65, store: '小黑酱', dish: '血糯米玫瑰奶酪芋泥、开心果奶酪、红豆沙、土豆泥辣卤鸡腿、土豆泥芝士火鸡面、烧椒香菜牛肉滑蛋、傣味虾仁魔芋面、鲜椒仔姜鸡胸肉', place: '配送到校' },
+      { id: 66, store: '芋见', dish: '东北饭包、麻辣火锅鸡、咖喱碎牛肉饭、可乐土豆泥卤肉饭、椰香咖喱鸡腿饭、抹茶奶酪可可奶砖、黑芝麻奶酪茉莉奶冻、酸菜芝士辣牛肉滑蛋、火鸡面厚蛋烧', place: '配送到校' },
+      { id: 67, store: '塔普料理', dish: '北非蛋、猪肉打抛饭', place: '配送到校' }
+    ];
+
+    const numberDisplay = document.getElementById('numberDisplay');
+    const drawBtn = document.getElementById('drawBtn');
+    const againBtn = document.getElementById('againBtn');
+    const manualInput = document.getElementById('manualInput');
+    const pickedNum = document.getElementById('pickedNum');
+    const pickedStore = document.getElementById('pickedStore');
+    const pickedDish = document.getElementById('pickedDish');
+    const pickedPlace = document.getElementById('pickedPlace');
+    const historyList = document.getElementById('historyList');
+    const foodGrid = document.getElementById('foodGrid');
+    const searchInput = document.getElementById('searchInput');
+    let rollingTimer = null;
+    let currentId = null;
+    let history = [];
+
+    function getFood(id) {
+      return foods.find(item => item.id === Number(id));
+    }
+
+    function renderPicked(item) {
+      currentId = item.id;
+      numberDisplay.textContent = item.id;
+      pickedNum.textContent = item.id;
+      pickedStore.textContent = item.store;
+      pickedDish.textContent = item.dish;
+      pickedPlace.textContent = item.place;
+      history = [item, ...history.filter(h => h.id !== item.id)].slice(0, 8);
+      renderHistory();
+      renderGrid(searchInput.value);
+      document.title = `${item.id} 号：${item.store} - 今天吃什么`;
+    }
+
+    function renderHistory() {
+      historyList.innerHTML = '';
+      if (!history.length) {
+        historyList.innerHTML = '<span class="history-item">暂无记录</span>';
+        return;
+      }
+      history.forEach(item => {
+        const span = document.createElement('span');
+        span.className = 'history-item';
+        span.textContent = `${item.id}. ${item.store}`;
+        historyList.appendChild(span);
+      });
+    }
+
+    function randomId() {
+      return Math.floor(Math.random() * 67) + 1;
+    }
+
+    function draw() {
+      clearInterval(rollingTimer);
+      drawBtn.disabled = true;
+      againBtn.disabled = true;
+      numberDisplay.classList.add('is-rolling');
+      const started = Date.now();
+      rollingTimer = setInterval(() => {
+        numberDisplay.textContent = randomId();
+        if (Date.now() - started > 900) {
+          clearInterval(rollingTimer);
+          const item = getFood(randomId());
+          numberDisplay.classList.remove('is-rolling');
+          renderPicked(item);
+          drawBtn.disabled = false;
+          againBtn.disabled = false;
+        }
+      }, 54);
+    }
+
+    function renderGrid(keyword = '') {
+      const q = keyword.trim().toLowerCase();
+      const list = q
+        ? foods.filter(item => `${item.id} ${item.store} ${item.dish} ${item.place}`.toLowerCase().includes(q))
+        : foods;
+      foodGrid.innerHTML = '';
+      list.forEach(item => {
+        const card = document.createElement('article');
+        card.className = 'food-card' + (item.id === currentId ? ' is-active' : '');
+        card.innerHTML = `
+          <div class="card-top">
+            <div>
+              <h3 class="card-store">${item.store}</h3>
+            </div>
+            <div class="card-num">${item.id}</div>
+          </div>
+          <p class="card-dish">${item.dish}</p>
+          <p class="card-place">📍 ${item.place}</p>
+        `;
+        card.addEventListener('click', () => renderPicked(item));
+        foodGrid.appendChild(card);
+      });
+    }
+
+    drawBtn.addEventListener('click', draw);
+    againBtn.addEventListener('click', draw);
+    manualInput.addEventListener('input', () => {
+      const item = getFood(manualInput.value);
+      if (item) renderPicked(item);
+    });
+    searchInput.addEventListener('input', () => renderGrid(searchInput.value));
+
+    renderGrid();
+  </script>
+</body>
+</html>
