@@ -81,7 +81,7 @@
       flex-wrap: wrap;
       justify-content: flex-end;
       gap: 8px;
-      max-width: 460px;
+      max-width: 560px;
     }
 
     .food-chip {
@@ -123,13 +123,13 @@
     }
 
     .draw-panel::before {
-      content: "🍲 🍔 🍕 🍜 🍗 🥟 🐟 🥘";
+      content: "🍲 🍛 🥟 🍣 🍤 🍚 🥗 🍮";
       position: absolute;
       left: 22px;
       right: 22px;
-      top: 18px;
-      color: rgba(35, 31, 32, .08);
-      font-size: clamp(30px, 5vw, 54px);
+      bottom: 118px;
+      color: rgba(35, 31, 32, .05);
+      font-size: clamp(28px, 4.4vw, 48px);
       text-align: center;
       pointer-events: none;
     }
@@ -162,7 +162,7 @@
       padding: 14px;
       border: 1px solid #f0d2bf;
       border-radius: 18px;
-      background: rgba(255, 253, 248, .88);
+      background: rgba(255, 253, 248, .97);
       box-shadow: 0 10px 28px rgba(118, 64, 36, .1);
     }
 
@@ -404,6 +404,68 @@
       font-size: 14px;
     }
 
+    .map-block {
+      display: grid;
+      gap: 12px;
+      margin-top: 16px;
+      padding-top: 14px;
+      border-top: 1px dashed rgba(138, 105, 78, .28);
+    }
+
+    .map-block.is-empty {
+      display: none;
+    }
+
+    .map-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+    }
+
+    .map-label {
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 800;
+      margin-bottom: 4px;
+    }
+
+    .map-title {
+      display: block;
+      line-height: 1.4;
+    }
+
+    .map-link,
+    .card-map-link {
+      color: #9b3a2d;
+      font-weight: 800;
+      text-decoration: none;
+    }
+
+    .map-link {
+      flex: 0 0 auto;
+      border: 1px solid #f0d2bf;
+      border-radius: 999px;
+      background: #fff;
+      padding: 8px 11px;
+      font-size: 13px;
+    }
+
+    .map-frame {
+      width: 100%;
+      height: 210px;
+      border: 0;
+      border-radius: 16px;
+      background: #f7efe6;
+    }
+
+    .map-refs {
+      margin: 0;
+      color: #6a554c;
+      font-size: 13px;
+      line-height: 1.55;
+    }
+
     .history {
       display: flex;
       flex-wrap: wrap;
@@ -507,6 +569,14 @@
       color: #8a6a5d;
     }
 
+    .card-map-link {
+      display: inline-flex;
+      align-items: center;
+      min-height: 28px;
+      margin-top: 8px;
+      font-size: 13px;
+    }
+
     .card-bottom {
       display: flex;
       flex-wrap: wrap;
@@ -586,21 +656,23 @@
         </div>
       </div>
       <div class="food-strip" aria-label="美食氛围标签">
-        <span class="food-chip">🍗 肯德基</span>
-        <span class="food-chip">🐟 来凤鱼</span>
-        <span class="food-chip">🐇 璧山兔</span>
-        <span class="food-chip">🥘 花雕醉鸡</span>
-        <span class="food-chip">🍜 螺蛳粉</span>
-        <span class="food-chip">🍔 汉堡</span>
+        <span class="food-chip">🍲 干锅</span>
+        <span class="food-chip">🍣 寿司</span>
+        <span class="food-chip">🍕 披萨</span>
+        <span class="food-chip">🥟 饺子</span>
+        <span class="food-chip">🍛 咖喱饭</span>
+        <span class="food-chip">🍢 烧烤</span>
+        <span class="food-chip">🍮 甜品</span>
+        <span class="food-chip">🥗 食堂</span>
       </div>
     </header>
 
     <section class="hero">
       <div class="draw-panel" aria-label="随机抽取区域">
         <div class="number-wrap">
-          <div class="category-window" aria-label="吃饭场景选择">
+          <div class="category-window" aria-label="怎么吃选择">
             <div class="category-copy">
-              <span class="kicker">吃饭场景</span>
+              <span class="kicker">怎么吃</span>
               <strong id="categoryTitle">全部店铺</strong>
             </div>
             <div class="category-options" id="categoryOptions"></div>
@@ -634,12 +706,23 @@
             </div>
             <div class="meta-row">
               <div class="meta-label">位置</div>
-              <div class="meta-value" id="pickedPlace">龙湖时代天街、南门、食堂、商业街、配送到校都在池子里。</div>
+              <div class="meta-value" id="pickedPlace">龙湖时代天街、南门、食堂、商业街、配送到校。</div>
             </div>
+          </div>
+          <div class="map-block is-empty" id="mapBlock">
+            <div class="map-head">
+              <div>
+                <div class="map-label">地图位置</div>
+                <strong class="map-title" id="mapTitle">摇到后显示地图</strong>
+              </div>
+              <a class="map-link" id="mapOpenLink" href="#" target="_blank" rel="noopener">打开地图</a>
+            </div>
+            <iframe class="map-frame" id="mapFrame" title="店铺地图" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+            <p class="map-refs" id="mapRefs"></p>
           </div>
           <div class="record-line">
             <span class="count-pill" id="eatCountText">已吃 0 次</span>
-            <button class="btn btn-small btn-record" id="recordBtn" type="button" disabled>确认吃了</button>
+            <button class="btn btn-small btn-record" id="recordBtn" type="button" disabled>确认</button>
           </div>
         </div>
         <div>
@@ -739,7 +822,7 @@
       { key: 'all', label: '全部', title: '全部店铺' },
       { key: 'party', label: '聚餐', title: '聚餐' },
       { key: 'delivery', label: '外卖', title: '外卖' },
-      { key: 'single', label: '1-2 人', title: '1-2 人餐' },
+      { key: 'single', label: '单人餐', title: '单人餐' },
       { key: 'canteen', label: '食堂', title: '食堂' }
     ];
 
@@ -748,6 +831,113 @@
       delivery: [34, 35, 36, 37, 38, 39, 49, 64, 65, 66, 67],
       single: [5, 8, 11, 12, 13, 14, 15, 21, 25, 28, 29, 32, 33, 34, 35, 36, 38, 41, 45, 46, 47, 49, 51, 54, 64, 65, 66, 67],
       canteen: [56, 57, 58, 59, 60, 61, 62, 63]
+    };
+
+    const locationProfiles = {
+      times: {
+        name: '龙湖成都时代天街',
+        detail: '成都市高新西区合作路89号，电子科技大学清水河校区西门附近',
+        lat: 30.75644,
+        lng: 103.91837,
+        refs: ['龙湖时代天街购物广场', '合信路（时代天街）站', '电子科大清水河校区西门'],
+        query: '龙湖成都时代天街 合作路89号'
+      },
+      southGate: {
+        name: '电子科技大学清水河校区南门',
+        detail: '成都市郫都区西源大道2006号，清水河校区南门周边',
+        lat: 30.74656,
+        lng: 103.92292,
+        refs: ['电子科大清水河校区南门', '顺江小区', '清源环街'],
+        query: '电子科技大学清水河校区南门'
+      },
+      campus: {
+        name: '电子科技大学清水河校区',
+        detail: '成都市郫都区西源大道2006号，校内餐厅或取餐点附近',
+        lat: 30.75316,
+        lng: 103.92829,
+        refs: ['电子科技大学清水河校区', '图书馆', '校内生活区'],
+        query: '电子科技大学清水河校区'
+      },
+      xuezi: {
+        name: '学子餐厅',
+        detail: '电子科技大学清水河校区内，学子餐厅档口',
+        lat: 30.75316,
+        lng: 103.92829,
+        refs: ['学子餐厅', '清水河校区', '校内生活区'],
+        query: '电子科技大学清水河校区 学子餐厅'
+      },
+      taoyuan: {
+        name: '桃园餐厅',
+        detail: '电子科技大学清水河校区内，桃园餐厅档口',
+        lat: 30.75316,
+        lng: 103.92829,
+        refs: ['桃园餐厅', '清水河校区', '校内生活区'],
+        query: '电子科技大学清水河校区 桃园餐厅'
+      },
+      northwest: {
+        name: '西北餐厅',
+        detail: '电子科技大学清水河校区内，西北餐厅档口',
+        lat: 30.75316,
+        lng: 103.92829,
+        refs: ['西北餐厅', '清水河校区', '校内生活区'],
+        query: '电子科技大学清水河校区 西北餐厅'
+      },
+      chaoyang: {
+        name: '朝阳餐厅',
+        detail: '电子科技大学清水河校区内，朝阳餐厅档口',
+        lat: 30.75316,
+        lng: 103.92829,
+        refs: ['朝阳餐厅', '清水河校区', '校内生活区'],
+        query: '电子科技大学清水河校区 朝阳餐厅'
+      },
+      yinhua: {
+        name: '银桦食堂',
+        detail: '电子科技大学清水河校区内，银桦食堂档口',
+        lat: 30.75316,
+        lng: 103.92829,
+        refs: ['银桦食堂', '清水河校区', '校内生活区'],
+        query: '电子科技大学清水河校区 银桦食堂'
+      },
+      siyuan: {
+        name: '思源食堂',
+        detail: '电子科技大学清水河校区内，思源食堂档口',
+        lat: 30.75316,
+        lng: 103.92829,
+        refs: ['思源食堂', '清水河校区', '校内生活区'],
+        query: '电子科技大学清水河校区 思源食堂'
+      },
+      kechuang: {
+        name: '科创食堂',
+        detail: '电子科技大学清水河校区内，科创食堂档口',
+        lat: 30.75316,
+        lng: 103.92829,
+        refs: ['科创食堂', '清水河校区', '校内生活区'],
+        query: '电子科技大学清水河校区 科创食堂'
+      },
+      furong: {
+        name: '芙蓉餐厅',
+        detail: '电子科技大学清水河校区内，芙蓉餐厅档口',
+        lat: 30.75316,
+        lng: 103.92829,
+        refs: ['芙蓉餐厅', '清水河校区', '校内生活区'],
+        query: '电子科技大学清水河校区 芙蓉餐厅'
+      },
+      commercial: {
+        name: '电子科技大学清水河校区商业街',
+        detail: '清水河校区商业街附近，小吃和快餐集中区域',
+        lat: 30.75316,
+        lng: 103.92829,
+        refs: ['清水河校区商业街', '麦当劳', 'JOJO 小铺'],
+        query: '电子科技大学清水河校区 商业街'
+      },
+      delivery: {
+        name: '配送到校',
+        detail: '配送到电子科技大学清水河校区，按实际取餐点或宿舍区为准',
+        lat: 30.75316,
+        lng: 103.92829,
+        refs: ['清水河校区', '校内取餐点', '学生宿舍区'],
+        query: '电子科技大学清水河校区'
+      }
     };
 
     const storageKey = 'foodRandomizerEatCounts';
@@ -762,6 +952,11 @@
     const pickedStore = document.getElementById('pickedStore');
     const pickedDish = document.getElementById('pickedDish');
     const pickedPlace = document.getElementById('pickedPlace');
+    const mapBlock = document.getElementById('mapBlock');
+    const mapTitle = document.getElementById('mapTitle');
+    const mapOpenLink = document.getElementById('mapOpenLink');
+    const mapFrame = document.getElementById('mapFrame');
+    const mapRefs = document.getElementById('mapRefs');
     const eatCountText = document.getElementById('eatCountText');
     const recordBtn = document.getElementById('recordBtn');
     const historyList = document.getElementById('historyList');
@@ -791,6 +986,47 @@
 
     function getFood(id) {
       return foods.find(item => item.id === Number(id));
+    }
+
+    function getLocationProfile(item) {
+      const place = item.place;
+      if (place.includes('龙湖')) return locationProfiles.times;
+      if (place.includes('南门') || place.includes('黄焖鸡')) return locationProfiles.southGate;
+      if (place.includes('学子')) return locationProfiles.xuezi;
+      if (place.includes('桃园')) return locationProfiles.taoyuan;
+      if (place.includes('西北')) return locationProfiles.northwest;
+      if (place.includes('朝阳')) return locationProfiles.chaoyang;
+      if (place.includes('银桦')) return locationProfiles.yinhua;
+      if (place.includes('思源')) return locationProfiles.siyuan;
+      if (place.includes('科创')) return locationProfiles.kechuang;
+      if (place.includes('芙蓉')) return locationProfiles.furong;
+      if (place.includes('商业街')) return locationProfiles.commercial;
+      if (place.includes('配送')) return locationProfiles.delivery;
+      return locationProfiles.campus;
+    }
+
+    function mapEmbedUrl(location) {
+      const latSpan = 0.006;
+      const lngSpan = 0.008;
+      const left = (location.lng - lngSpan).toFixed(6);
+      const right = (location.lng + lngSpan).toFixed(6);
+      const bottom = (location.lat - latSpan).toFixed(6);
+      const top = (location.lat + latSpan).toFixed(6);
+      return `https://www.openstreetmap.org/export/embed.html?bbox=${left}%2C${bottom}%2C${right}%2C${top}&layer=mapnik&marker=${location.lat}%2C${location.lng}`;
+    }
+
+    function mapSearchUrl(item, location) {
+      const query = `${item.store} ${location.query}`;
+      return `https://www.amap.com/search?query=${encodeURIComponent(query)}`;
+    }
+
+    function renderMap(item) {
+      const location = getLocationProfile(item);
+      mapBlock.classList.remove('is-empty');
+      mapTitle.textContent = `${item.store} · ${location.name}`;
+      mapOpenLink.href = mapSearchUrl(item, location);
+      mapFrame.src = mapEmbedUrl(location);
+      mapRefs.textContent = `详细地址：${location.detail}。参考：${location.refs.join('、')}。`;
     }
 
     function getCategoryIds(categoryKey = activeCategory) {
@@ -829,7 +1065,8 @@
       pickedNum.textContent = item.id;
       pickedStore.textContent = item.store;
       pickedDish.textContent = item.dish;
-      pickedPlace.textContent = item.place;
+      pickedPlace.textContent = getLocationProfile(item).detail;
+      renderMap(item);
       renderEatCount(item.id);
       history = [item, ...history.filter(h => h.id !== item.id)].slice(0, 8);
       renderHistory();
@@ -883,7 +1120,7 @@
         const button = document.createElement('button');
         button.type = 'button';
         button.className = 'category-btn' + (category.key === activeCategory ? ' is-active' : '');
-        button.textContent = `${category.label} ${getCategoryFoods(category.key).length}`;
+        button.textContent = category.label;
         button.addEventListener('click', () => {
           activeCategory = category.key;
           renderCategories();
@@ -895,7 +1132,7 @@
       const active = categoryDefinitions.find(category => category.key === activeCategory);
       const count = getCategoryFoods().length;
       categoryTitle.textContent = active.title;
-      rangeLabel.textContent = `🎲 当前池子：${active.title} · ${count} 家`;
+      rangeLabel.textContent = `🎲 当前池子：${active.title}`;
       listTitle.textContent = `${active.title}清单 · ${count} 项`;
     }
 
@@ -910,6 +1147,7 @@
         const card = document.createElement('article');
         card.className = 'food-card' + (item.id === currentId ? ' is-active' : '');
         const categoryTags = getFoodCategories(item).map(label => `<span class="category-tag">${label}</span>`).join('');
+        const location = getLocationProfile(item);
         card.innerHTML = `
           <div class="card-top">
             <div>
@@ -918,13 +1156,15 @@
             <div class="card-num">${item.id}</div>
           </div>
           <p class="card-dish">${item.dish}</p>
-          <p class="card-place">📍 ${item.place}</p>
+          <p class="card-place">📍 ${location.detail}</p>
+          <a class="card-map-link" href="${mapSearchUrl(item, location)}" target="_blank" rel="noopener">查看地图</a>
           <div class="card-bottom">
             <div class="card-categories">${categoryTags}</div>
             <span class="eat-badge">已吃 ${getEatCount(item.id)} 次</span>
           </div>
         `;
         card.addEventListener('click', () => renderPicked(item));
+        card.querySelector('.card-map-link').addEventListener('click', event => event.stopPropagation());
         foodGrid.appendChild(card);
       });
     }
