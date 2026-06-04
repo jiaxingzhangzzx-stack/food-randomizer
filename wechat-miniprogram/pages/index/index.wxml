@@ -1,0 +1,123 @@
+<view class="page">
+  <view class="topbar">
+    <view class="brand">
+      <view class="brand-mark">🍽</view>
+      <view>
+        <view class="title">今天吃什么</view>
+        <view class="subtitle">按场景随机摇号，摇到哪个吃哪个。</view>
+      </view>
+    </view>
+    <view class="food-strip">
+      <view class="food-chip" wx:for="{{chips}}" wx:key="*this">{{item}}</view>
+    </view>
+  </view>
+
+  <view class="draw-panel">
+    <view class="category-window">
+      <view class="category-copy">
+        <text class="kicker">怎么吃</text>
+        <text class="category-title">{{activeTitle}}</text>
+      </view>
+      <view class="category-options">
+        <button
+          class="category-btn {{activeCategory === item.key ? 'is-active' : ''}}"
+          wx:for="{{categories}}"
+          wx:key="key"
+          data-key="{{item.key}}"
+          bindtap="changeCategory"
+        >
+          {{item.label}}
+        </button>
+      </view>
+    </view>
+
+    <view class="range-label">🎲 当前池子：{{activeTitle}}</view>
+    <view class="number {{isRolling ? 'is-rolling' : ''}}">{{numberText}}</view>
+
+    <view class="actions">
+      <button class="btn btn-primary" disabled="{{isRolling}}" bindtap="draw">🎲 开摇</button>
+      <button class="btn btn-ghost" disabled="{{isRolling}}" bindtap="draw">再来一次</button>
+      <view class="manual">
+        <text>#</text>
+        <input class="manual-input" type="number" placeholder="编号" value="{{manualValue}}" bindinput="onManualInput" />
+      </view>
+    </view>
+  </view>
+
+  <view class="result-panel">
+    <view class="section-title">本次结果</view>
+    <view class="picked">
+      <view class="picked-head">
+        <view class="picked-store">{{picked ? picked.store : '先摇一下'}}</view>
+        <view class="picked-num">{{picked ? picked.id : '?'}}</view>
+      </view>
+
+      <view class="meta">
+        <view class="meta-row">
+          <view class="meta-label">推荐菜</view>
+          <view class="meta-value">{{picked ? picked.dish : '让随机数决定今天的快乐。'}}</view>
+        </view>
+        <view class="meta-row">
+          <view class="meta-label">位置</view>
+          <view class="meta-value">{{picked ? currentLocation.detail : '龙湖时代天街、南门、食堂、商业街、配送到校。'}}</view>
+        </view>
+      </view>
+
+      <view class="map-block" wx:if="{{picked}}">
+        <view class="map-head">
+          <view>
+            <view class="map-label">地图位置</view>
+            <view class="map-title">{{picked.store}} · {{currentLocation.name}}</view>
+          </view>
+          <button class="map-open" bindtap="openMap">打开地图</button>
+        </view>
+        <map
+          class="map"
+          longitude="{{currentLocation.lng}}"
+          latitude="{{currentLocation.lat}}"
+          scale="16"
+          markers="{{markers}}"
+          enable-scroll="{{true}}"
+          enable-zoom="{{true}}"
+          show-location="{{false}}"
+        />
+        <view class="map-refs">详细地址：{{currentLocation.detail}}。参考：{{currentLocation.refsText}}。</view>
+      </view>
+
+      <view class="record-line">
+        <view class="count-pill">已吃 {{picked ? picked.eatCount : 0}} 次</view>
+        <button class="btn btn-small btn-record" disabled="{{!picked}}" bindtap="confirmEat">确认</button>
+      </view>
+    </view>
+
+    <view class="section-title history-title">最近摇到</view>
+    <view class="history">
+      <view wx:if="{{!history.length}}" class="history-item">暂无记录</view>
+      <view class="history-item" wx:for="{{history}}" wx:key="id">{{item.id}}. {{item.store}}</view>
+    </view>
+  </view>
+
+  <view class="list-panel">
+    <view class="list-header">
+      <view class="section-title">{{activeTitle}}清单 · {{visibleFoods.length}} 项</view>
+      <input class="search" type="text" placeholder="搜索店名、菜品或地址" value="{{keyword}}" bindinput="onSearch" />
+    </view>
+    <scroll-view class="grid" scroll-y>
+      <view class="food-card {{item.id === currentId ? 'is-active' : ''}}" wx:for="{{visibleFoods}}" wx:key="id" data-id="{{item.id}}" bindtap="pickByCard">
+        <view class="card-top">
+          <view class="card-store">{{item.store}}</view>
+          <view class="card-num">{{item.id}}</view>
+        </view>
+        <view class="card-dish">{{item.dish}}</view>
+        <view class="card-place">📍 {{item.location.detail}}</view>
+        <button class="card-map-link" data-id="{{item.id}}" catchtap="openCardMap">查看地图</button>
+        <view class="card-bottom">
+          <view class="card-categories">
+            <text class="category-tag" wx:for="{{item.categoryLabels}}" wx:key="*this" wx:for-item="tag">{{tag}}</text>
+          </view>
+          <view class="eat-badge">已吃 {{item.eatCount}} 次</view>
+        </view>
+      </view>
+    </scroll-view>
+  </view>
+</view>
